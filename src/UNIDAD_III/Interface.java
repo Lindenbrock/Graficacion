@@ -2,17 +2,20 @@ package UNIDAD_III;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class Interface extends JPanel{
+public class Interface extends JPanel implements ChangeListener{
 	JFrame W;
 	Figure3D Fig3D;
-	JSlider sliderX;
+	JSlider sliderX,sliderY,sliderZ;
+	JPanel southPanel,panelSX,panelSY,panelSZ;
 	
 	public Interface (double figCoordinates[][], int figSequence[]) {
 		W = new JFrame("Transformaciones en 3D");
@@ -25,20 +28,47 @@ public class Interface extends JPanel{
 		sliderX.setMajorTickSpacing(45);
 		sliderX.setPaintTicks(true);
 		sliderX.setPaintLabels(true);
-		W.add(sliderX,BorderLayout.SOUTH);
+		
+		panelSX = new JPanel();
+		TitledBorder tbPSX = new TitledBorder("Rotación en el eje X");
+		tbPSX.setTitleJustification(TitledBorder.CENTER);
+		panelSX.setBorder(tbPSX);
+		panelSX.add(sliderX);
+		
+		sliderY = new JSlider(JSlider.HORIZONTAL, 0, 360, 0);
+		sliderY.setMinorTickSpacing(15);
+		sliderY.setMajorTickSpacing(45);
+		sliderY.setPaintTicks(true);
+		sliderY.setPaintLabels(true);
+		
+		panelSY = new JPanel();
+		TitledBorder tbPSY = new TitledBorder("Rotación en el eje Y");
+		tbPSY.setTitleJustification(TitledBorder.CENTER);
+		panelSY.setBorder(tbPSY);
+		panelSY.add(sliderY);
+		
+		sliderZ = new JSlider(JSlider.HORIZONTAL, 0, 360, 0);
+		sliderZ.setMinorTickSpacing(15);
+		sliderZ.setMajorTickSpacing(45);
+		sliderZ.setPaintTicks(true);
+		sliderZ.setPaintLabels(true);
+		
+		panelSZ = new JPanel();
+		TitledBorder tbPSZ = new TitledBorder("Rotación en el eje Z");
+		tbPSZ.setTitleJustification(TitledBorder.CENTER);
+		panelSZ.setBorder(tbPSZ);
+		panelSZ.add(sliderZ);
+		
+		southPanel = new JPanel(new GridLayout(1,3));
+		southPanel.add(panelSX); southPanel.add(panelSY); southPanel.add(panelSZ);
+		
+		W.add(southPanel,BorderLayout.SOUTH);
 		
 		Fig3D = new Figure3D(figCoordinates,figSequence);
 		
-		//EVENTOS
-		sliderX.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				Fig3D.rotateX(sliderX.getValue());
-				repaint();
-			}
-			
-		});
+		sliderX.addChangeListener(this);
+		sliderY.addChangeListener(this);
+		sliderZ.addChangeListener(this);
 		
 		W.setVisible(true);
 		W.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -64,5 +94,13 @@ public class Interface extends JPanel{
 		int figSequence[]= {2,1,2,3,3,4,4,1,1,0,2,0,3,0,4,0};
 		
 		new Interface(figCoordinates,figSequence);
+	}
+
+	
+	//EVENTOS DE ROTACIÓN
+	@Override
+	public void stateChanged(ChangeEvent ev) {
+		Fig3D.rotateXYZH(sliderX.getValue(),sliderY.getValue(),sliderZ.getValue());
+		repaint();
 	}
 }

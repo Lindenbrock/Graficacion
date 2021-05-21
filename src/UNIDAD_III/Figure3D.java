@@ -43,12 +43,100 @@ public class Figure3D {
 	
 	//ROTACIÓN EN EL EJE X
 	public void rotateX(int deg) {
-		//[x, y*Cos   - z*Sen, y*Sen  + z*cos]
+		//[x, y*Cos - z*Sen, y*Sen + z*cos]
 		double degRad = Math.toRadians(deg), cos = Math.cos(degRad), sin = Math.sin(degRad);
 		for(int i=0;i < Fig3D.length;i++) {
 			double y = Fig3DOriginal[i][1], z = Fig3DOriginal[i][2];
 			Fig3D[i][1] = y*cos - z*sin;
 			Fig3D[i][2] = y*sin + z*cos;
+		}
+	}
+	
+	//ROTACIÓN EN EL EJE Y
+	public void rotateY(int deg) {
+		//[x*Cos - z*Sen, y, x*Sen + z*cos]
+		double degRad = Math.toRadians(deg), cos = Math.cos(degRad), sin = Math.sin(degRad);
+		for(int i=0;i < Fig3D.length;i++) {
+			double x = Fig3DOriginal[i][0], z = Fig3DOriginal[i][2];
+			Fig3D[i][0] = x*cos - z*sin;
+			Fig3D[i][2] = x*sin + z*cos;
+		}
+	}
+	
+	//ROTACIÓN EN EL EJE Z
+	public void rotateZ(int deg) {
+		//[x*Cos - y*Sen, x*Sen  + y*Cos, z]
+		double degRad = Math.toRadians(deg), cos = Math.cos(degRad), sin = Math.sin(degRad);
+		for(int i=0;i < Fig3D.length;i++) {
+			double x = Fig3DOriginal[i][0], y = Fig3DOriginal[i][1];
+			Fig3D[i][0] = x*cos - y*sin;
+			Fig3D[i][1] = x*sin + y*cos;
+		}
+	}
+	
+	
+	//ROTACIÓN ENLAZANDO LOS TRES EJES
+	//  ROTACIÓN EN EL EJE X QUE RETORNA LA FIGURA CON LA TRASFORMACIÓN APLICADA
+	public double[][] rotateXT(int deg) {
+		double Fig3DTemp[][] = new double[Fig3DOriginal.length][3];
+		double degRad = Math.toRadians(deg), cos = Math.cos(degRad), sin = Math.sin(degRad);
+		for(int i=0;i < Fig3D.length;i++) {
+			double x = Fig3DOriginal[i][0],y = Fig3DOriginal[i][1], z = Fig3DOriginal[i][2];
+			Fig3DTemp[i][0] = x;
+			Fig3DTemp[i][1] = y*cos - z*sin;
+			Fig3DTemp[i][2] = y*sin + z*cos;
+		}
+		
+		return Fig3DTemp;
+	}
+	
+	//	ROTACIÓN EN EL EJE Y QUE RETORNA LA FIGURA CON LA TRASFORMACIÓN APLICADA
+	public double[][] rotateYT(int deg, double Fig3DAux[][]) {
+		double Fig3DTemp[][] = new double[Fig3DOriginal.length][3];
+		double degRad = Math.toRadians(deg), cos = Math.cos(degRad), sin = Math.sin(degRad);
+		for(int i=0;i < Fig3D.length;i++) {
+			double x = Fig3DAux[i][0],y = Fig3DAux[i][1], z = Fig3DAux[i][2];
+			Fig3DTemp[i][0] = x*cos - z*sin;
+			Fig3DTemp[i][1] = y;
+			Fig3DTemp[i][2] = x*sin + z*cos;
+		}
+		
+		return Fig3DTemp;
+	}
+	
+	//	ROTACIÓN EN EL EJE Z APLICADA A LA FIGURA TRANSFORMADA POR LOS OTROS MÉTODOS
+	public void rotateZT(int deg, double[][] Fig3DAux) {
+		//[x*Cos - y*Sen, x*Sen  + y*Cos, z]
+		double degRad = Math.toRadians(deg), cos = Math.cos(degRad), sin = Math.sin(degRad);
+		for(int i=0;i < Fig3D.length;i++) {
+			double x = Fig3DAux[i][0],y = Fig3DAux[i][1], z = Fig3DAux[i][2];
+			Fig3D[i][0] = x*cos - y*sin;
+			Fig3D[i][1] = x*sin + y*cos;
+			Fig3D[i][2] = z;
+		}
+	}
+	
+	//	MANDAR ROTAR EN X, LUEGO EN Y, Y POR ULTIMO EN Z LA MISMA FIGURA
+	public void rotateXYZ(int degX, int degY, int degZ) {
+		double Fig3DRes[][] = rotateXT(degX);
+		Fig3DRes = rotateYT(degY,Fig3DRes);
+		rotateZT(degZ, Fig3DRes);
+	}
+	
+	//		ROTACIÓN CON COORDENADAS HOMOGÉNEAS
+	public void rotateXYZH(int degX, int degY, int degZ) {
+		/* x*(Cos 2* Cos 3)+y*((Sen 1*(-Sen 2))*Cos 3+Cos 1*-Sen 3)+z*((Cos 1*-Sen 2)*Cos 3+(-Sen 1)*( -Sen 3)),
+		  x*( Cos 2*Sen 3)+y*((Sen 1*(-Sen 2))* Sen 3+-Cos 1*Cos 2)+z(Cos 1*(-Sen 2)*(Sen 3)+(-Sen 1*Cos 3),
+		  x*(Sen 2)+y*(Sen 1*Cos 2)+z*(Cos 1*Cos 2) */
+		double degRadX = Math.toRadians(degX), degRadY = Math.toRadians(degY), degRadZ = Math.toRadians(degZ);
+		double cos1 = Math.cos(degRadX), sin1 = Math.sin(degRadX);
+		double cos2 = Math.cos(degRadY), sin2 = Math.sin(degRadY);
+		double cos3 = Math.cos(degRadZ), sin3 = Math.sin(degRadZ);
+		for(int i=0;i < Fig3D.length;i++) {
+			double x = Fig3DOriginal[i][0],y = Fig3DOriginal[i][1], z = Fig3DOriginal[i][2];
+			Fig3D[i][0] = x*(cos2*cos3) + y*(sin1*(-sin2)*cos3 + cos1*(-sin3)) + z*(cos1*(-sin2)*cos3 + (-sin1)*(-sin3));
+			Fig3D[i][1] = x*(cos2*sin3) + y*(sin1*(-sin2)*sin3 + cos1*cos3) + z*(cos1*(-sin2)*(sin3)+(-sin1)*cos3);
+			Fig3D[i][2] = x*(sin2)+y*(sin1*cos2)+z*(cos1*cos2);
 		}
 	}
 }
