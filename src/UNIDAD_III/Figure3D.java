@@ -6,6 +6,11 @@ public class Figure3D {
 	double Fig3D[][],Fig3DOriginal[][], Fig2D[][];
 	int Sequence[], distance=800, mz=-250;
 	
+	//	ACTUALIZAR LA DISTANCIA DEL OBSERVADOR
+	public void updateDistance(int dist) {
+		distance = dist;
+	}
+	
 	public Figure3D(double Fig[][],int Seq[]) {
 		Fig3DOriginal = new double [Fig.length][3];
 		Fig3D = new double[Fig.length][3];
@@ -22,7 +27,7 @@ public class Figure3D {
 			Sequence[i] = Seq[i];
 	}
 	
-	//Convertir coordenadas 3D a 2D antes de dibujar
+	//	Convertir coordenadas 3D a 2D antes de dibujar
 	public void convertTo2D() {
 		for(int i=0;i<Fig2D.length;i++) {
 			//cx = (d*x)/(z+mz)
@@ -34,6 +39,7 @@ public class Figure3D {
 		}			
 	}
 	
+	//	DIBUJAR FIGURA 3D
 	public void draw(Graphics g) {
 		for(int i=0;i<=Sequence.length-1;i+=2)
 			g.drawLine((int)Fig2D[Sequence[i]][0], (int)Fig2D[Sequence[i]][1], (int)Fig2D[Sequence[i+1]][0], (int)Fig2D[Sequence[i+1]][1]);
@@ -123,7 +129,7 @@ public class Figure3D {
 		rotateZT(degZ, Fig3DRes);
 	}
 	
-	//		ROTACIÓN CON COORDENADAS HOMOGÉNEAS
+	//	ROTACIÓN CON COORDENADAS HOMOGÉNEAS
 	public void rotateXYZH(int degX, int degY, int degZ) {
 		/* x*(Cos 2* Cos 3)+y*((Sen 1*(-Sen 2))*Cos 3+Cos 1*-Sen 3)+z*((Cos 1*-Sen 2)*Cos 3+(-Sen 1)*( -Sen 3)),
 		  x*( Cos 2*Sen 3)+y*((Sen 1*(-Sen 2))* Sen 3+-Cos 1*Cos 2)+z(Cos 1*(-Sen 2)*(Sen 3)+(-Sen 1*Cos 3),
@@ -137,6 +143,17 @@ public class Figure3D {
 			Fig3D[i][0] = x*(cos2*cos3) + y*(sin1*(-sin2)*cos3 + cos1*(-sin3)) + z*(cos1*(-sin2)*cos3 + (-sin1)*(-sin3));
 			Fig3D[i][1] = x*(cos2*sin3) + y*(sin1*(-sin2)*sin3 + cos1*cos3) + z*(cos1*(-sin2)*(sin3)+(-sin1)*cos3);
 			Fig3D[i][2] = x*(sin2)+y*(sin1*cos2)+z*(cos1*cos2);
+		}
+	}
+	
+	//	ESCALAMIENTO
+	public void scaleXYZ(double scale) {
+		//x+Ty,y+Ty,z+Tz
+		for(int i=0;i < Fig3D.length;i++) {
+			double x = Fig3DOriginal[i][0],y = Fig3DOriginal[i][1], z = Fig3DOriginal[i][2];
+			Fig3D[i][0] = Fig3DOriginal[i][0]*scale;
+			Fig3D[i][1] = Fig3DOriginal[i][1]*scale;
+			Fig3D[i][2] = Fig3DOriginal[i][2]*scale;
 		}
 	}
 }

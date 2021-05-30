@@ -14,7 +14,7 @@ import javax.swing.event.ChangeListener;
 public class Interface extends JPanel implements ChangeListener{
 	JFrame W;
 	Figure3D Fig3D;
-	JSlider sliderX,sliderY,sliderZ;
+	JSlider sliderX,sliderY,sliderZ,sliderSca;
 	JPanel southPanel,panelSX,panelSY,panelSZ;
 	
 	public Interface (double figCoordinates[][], int figSequence[]) {
@@ -62,6 +62,14 @@ public class Interface extends JPanel implements ChangeListener{
 		southPanel = new JPanel(new GridLayout(1,3));
 		southPanel.add(panelSX); southPanel.add(panelSY); southPanel.add(panelSZ);
 		
+		sliderSca = new JSlider(JSlider.VERTICAL,100,2300,1000);
+		sliderSca.setMinorTickSpacing(50);
+		sliderSca.setMajorTickSpacing(100);
+		sliderSca.setPaintTicks(true);
+		sliderSca.setPaintLabels(true);
+		
+		W.add(sliderSca,BorderLayout.EAST);
+		
 		W.add(southPanel,BorderLayout.SOUTH);
 		
 		Fig3D = new Figure3D(figCoordinates,figSequence);
@@ -69,6 +77,7 @@ public class Interface extends JPanel implements ChangeListener{
 		sliderX.addChangeListener(this);
 		sliderY.addChangeListener(this);
 		sliderZ.addChangeListener(this);
+		sliderSca.addChangeListener(this);
 		
 		W.setVisible(true);
 		W.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -100,7 +109,13 @@ public class Interface extends JPanel implements ChangeListener{
 	//EVENTOS DE ROTACIÓN
 	@Override
 	public void stateChanged(ChangeEvent ev) {
-		Fig3D.rotateXYZH(sliderX.getValue(),sliderY.getValue(),sliderZ.getValue());
+		if(ev.getSource() == sliderX || ev.getSource() == sliderY || ev.getSource() == sliderZ)
+			Fig3D.rotateXYZH(sliderX.getValue(),sliderY.getValue(),sliderZ.getValue());
+		else
+			if(ev.getSource() == sliderSca) {
+				int distance = sliderSca.getValue();
+				Fig3D.updateDistance(distance);
+			}
 		repaint();
 	}
 }
